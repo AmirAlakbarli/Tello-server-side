@@ -4,9 +4,22 @@ const orderSchema = mongoose.Schema(
   {
     status: {
       type: String,
-      required: [true, "Please provide a status!"],
-      enum: ["pending", "shipping", "canceled", "pickup", "declined", "refund"],
+      required: [true, "Please enter a status!"],
+      enum: [
+        "pending",
+        "shipping",
+        "cancelled",
+        "pickup",
+        "declined",
+        "refund",
+      ],
     },
+
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+    },
+
     orderItems: [
       {
         productId: {
@@ -18,15 +31,8 @@ const orderSchema = mongoose.Schema(
         },
       },
     ],
-
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const Order = mongoose.model("order", orderSchema);

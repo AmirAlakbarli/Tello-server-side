@@ -7,12 +7,12 @@ const userSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Please enter a name!"],
+      required: [true, "User name must be defined!"],
     },
 
     surname: {
       type: String,
-      required: [true, "Please enter a surname!"],
+      required: [true, "User surname must be defined!"],
     },
 
     email: {
@@ -20,15 +20,7 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
       requires: true,
-      validate: [validator.isEmail, "Please enter a correct email!"],
-    },
-
-    photo: String,
-
-    role: {
-      type: String,
-      enum: ["user", "admin"],
-      default: "user",
+      validate: [validator.isEmail, "Please enter a correct email"],
     },
 
     password: {
@@ -44,8 +36,18 @@ const userSchema = mongoose.Schema(
         validator: function (passwordConfirm) {
           return passwordConfirm === this.password;
         },
-        message: "Please sure confirming password is same as password",
+        message: "Please sure confirming password is as same as password",
       },
+    },
+
+    number: String,
+
+    photo: String,
+
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
     },
 
     forgetPassword: String,
@@ -75,5 +77,6 @@ userSchema.methods.generatePassToken = async function () {
   this.resetExpires = Date.now() + 15 * 60 * 1000;
   return resetToken;
 };
+
 const User = mongoose.model("user", userSchema);
 module.exports = User;
