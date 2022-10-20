@@ -20,6 +20,10 @@ const productSchema = mongoose.Schema(
       },
     ],
 
+    price: {
+      type: Number,
+    },
+
     ratingsQuantity: {
       type: Number,
     },
@@ -30,5 +34,14 @@ const productSchema = mongoose.Schema(
 
     variants: [Object],
   },
+
   { timestamps: true }
 );
+
+productSchema.pre("save", function (next) {
+  this.slug = slugify(this.name, "-");
+  next();
+});
+
+const Product = mongoose.model("product", productSchema);
+module.exports = Product;

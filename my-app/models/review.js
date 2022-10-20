@@ -6,23 +6,25 @@ const reviewSchema = mongoose.Schema(
     description: {
       type: String,
     },
+
     rating: {
       type: Number,
       min: 1,
       max: 5,
     },
+
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
+
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "product",
     },
   },
-  {
-    timestamps: true,
-  }
+
+  { timestamps: true }
 );
 
 reviewSchema.statics.calcRatingsAverage = async function (productId) {

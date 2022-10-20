@@ -8,8 +8,9 @@ const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 
 //! Routes
+const productRouter = require("./routes/productRouter");
 
-//! get limit for users request
+//! get limit for users requests
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -34,7 +35,10 @@ if (process.env.NODE_ENV === "development") {
 //! Build in Middleware
 app.use(express.json());
 
+//! first route /api/v1
+
 //! api for routers
+app.use("/api/v1/products", productRouter);
 
 //! Any request with non existing endpoint
 app.use((req, res, next) => {

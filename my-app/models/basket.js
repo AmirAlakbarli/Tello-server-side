@@ -6,6 +6,7 @@ const basketSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: [true, "Please provide a userId!"],
     },
+
     products: [
       {
         productId: {
@@ -24,12 +25,13 @@ const basketSchema = mongoose.Schema(
         name: String,
       },
     ],
+
     totalCount: Number,
+
     totalPrice: Number,
   },
-  {
-    timestamps: true,
-  }
+
+  { timestamps: true }
 );
 
 basketSchema.pre("save", function () {

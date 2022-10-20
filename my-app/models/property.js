@@ -7,10 +7,12 @@ const propertySchema = mongoose.Schema(
       type: String,
       required: [true, "Property name must be defined!"],
     },
+
     values: {
       type: Array,
     },
   },
+
   { timestamps: true }
 );
 

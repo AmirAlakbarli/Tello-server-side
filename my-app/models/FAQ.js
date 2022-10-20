@@ -11,6 +11,7 @@ const FAQSchema = mongoose.Schema(
       required: [true, "Please provide a description!"],
     },
   },
+
   { timestamps: true }
 );
 
