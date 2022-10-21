@@ -12,13 +12,28 @@ router.get("/", productController.getAllProducts);
 router.get("/:id", productController.getProductById);
 
 // create new product
-router.post("/", productController.createProduct);
+router.post(
+  "/",
+  privateRoute,
+  access("admin"),
+  productController.createProduct
+);
 
 // update product
-router.patch("/:id", productController.updateProduct);
+router.patch(
+  "/:id",
+  privateRoute,
+  access("admin"),
+  productController.updateProduct
+);
 
 // delete product
-router.delete("/:id", productController.deleteProduct);
+router.delete(
+  "/:id",
+  privateRoute,
+  access("admin"),
+  productController.deleteProduct
+);
 
 // get reviews by productId
 router.get("/:productId/reviews");

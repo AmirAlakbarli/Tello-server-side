@@ -14,11 +14,11 @@ exports.getAllProperties = asyncCatch(async (req, res, next) => {
 
 exports.getPropertyById = asyncCatch(async (req, res, next) => {
   const id = req.id;
-  const property = await Property.findById(id);
-  if (!property) next(new GlobalError("Invalid id: FINDONE", 404));
+  const oneProperty = await Property.findById(id);
+  if (!oneProperty) next(new GlobalError("Invalid id: FINDONE", 404));
   res.status(200).json({
     success: true,
-    data: { property },
+    data: { property: oneProperty },
   });
 });
 

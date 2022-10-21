@@ -9,13 +9,13 @@ const { deleteOne } = require("../utils/factory");
 //   res.status(200).json({ success: true, data: { reviews } });
 // });
 
-// exports.getReviewsByTourId = asyncCatch(async (req, res, next) => {
-//   const tourId = req.params.tourId;
-//   const reviews = await Review.find({ tour: tourId });
+// exports.getReviewsByProductId = asyncCatch(async (req, res, next) => {
+//   const productId = req.params.productId;
+//   const reviews = await Review.find({ tour: productId });
 //   res.status(200).json({ success: true, data: { reviews } });
 // });
 
-//! merging of getAllReviews and getReviewsById
+//! merging of getAllReviews and getReviewsByProductId
 exports.getReviews = asyncCatch(async (req, res, next) => {
   const productId = req.params.productId;
   if (tourId) {

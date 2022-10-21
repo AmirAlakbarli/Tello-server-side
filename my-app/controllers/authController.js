@@ -6,7 +6,7 @@ const sendEmail = require("../utils/email");
 const bcrypt = require("bcryptjs");
 
 function signJWT(id) {
-  const token = jwt.sign({ id: id }, process.env.JWT_SIGNATURE, {
+  const token = jwt.sign({ id }, process.env.JWT_SIGNATURE, {
     expiresIn: process.env.JWT_EXPIRE,
   });
   return token;
@@ -21,7 +21,7 @@ exports.signUp = asyncCatch(async (req, res, next) => {
   });
   if (!newUser)
     return next(new GlobalError("Cannot create a new user account!"));
-  const token = signJWT(user._id);
+  const token = signJWT(newUser._id);
 
   res.status(201).json({ success: true, data: { user: newUser, token } });
 });
@@ -32,7 +32,7 @@ exports.login = asyncCatch(async (req, res, next) => {
   if (!(email && password))
     return next(new GlobalError("Please insert email and password!"));
 
-  //! Checkif email and password are correct
+  //! Check if email and password are correct
   const user = await User.findOne({ email }).select("+password");
   const isCorrect = await user.checkPassword(password, user.password);
   if (!(user && isCorrect))
