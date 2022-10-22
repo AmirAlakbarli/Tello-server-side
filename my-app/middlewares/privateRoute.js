@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
 const asyncCatch = require("../utils/asyncCatch");
 const User = require("../models/user");
+const Basket = require("../models/basket");
 
 const privateRoute = asyncCatch(async (req, res, next) => {
   let token;
@@ -18,13 +19,15 @@ const privateRoute = asyncCatch(async (req, res, next) => {
 
   //! Check if toke is valid
   const verifyPromise = promisify(jwt.verify);
-  const userInfo = await verifyPromise(token, process.env.JWT_SIGNATURE);
+  const info = await verifyPromise(token, process.env.JWT_SIGNATURE);
 
-  //! Check if user with sended token is exist
-  const user = await User.findById(userInfo.id);
-  if (!user)
-    return next(new GlobalError("User with sent token isn't exist", 403));
-  req.user = user;
+  //! Check if user with sent token is exist
+  const user = await User.findById(info.id);
+  //! Check if basket with sent token is exist
+  const basket = await Basket.findById(info.id);
+  if (!user && !basket) return next(new GlobalError("Token isn't exist", 403));
+  if (user) req.user = user;
+  if (basket) req.basket = basket;
   next();
 });
 

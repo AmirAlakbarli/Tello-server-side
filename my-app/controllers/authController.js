@@ -49,7 +49,7 @@ exports.signUp = asyncCatch(async (req, res, next) => {
     return next(new GlobalError("Cannot create basket for new user!"));
 
   newUser.password = undefined;
-  res.status(201).json({ success: true, data: { token, user: newUser } });
+  res.status(201).json({ success: true, data: { token } });
 });
 
 exports.login = asyncCatch(async (req, res, next) => {
@@ -69,7 +69,10 @@ exports.login = asyncCatch(async (req, res, next) => {
   const token = signJWT(user._id);
 
   user.password = undefined;
-  res.json({ success: true, data: { token, user } });
+  res.json({
+    success: true,
+    data: { token },
+  });
 });
 
 exports.forgetPassword = asyncCatch(async (req, res, next) => {
@@ -90,7 +93,10 @@ exports.forgetPassword = asyncCatch(async (req, res, next) => {
       message: path,
     });
 
-    res.status(200).json({ success: true, message: "Email was sent!" });
+    res.status(200).json({
+      success: true,
+      message: "Email was sent!",
+    });
   } catch (error) {
     return next(new GlobalError("Cannot sent link to reset password!", 401));
   }
@@ -130,7 +136,9 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    token: newToken,
+    data: {
+      token: newToken,
+    },
   });
 });
 
@@ -156,14 +164,21 @@ exports.changePassword = asyncCatch(async (req, res, next) => {
   if (!isPasswordCorrect)
     return next(new GlobalError("Incorrect old password!", 403));
 
+  if (req.body.newPassword !== req.body.passwordConfirm)
+    return next(
+      new GlobalError("Confirmation of password isn't same as password")
+    );
+
   user.password = req.body.newPassword;
-  user.passwordConfirm = req.body.passwordConfirm;
+
   await user.save();
 
   const token = signJWT(user._id);
 
   res.status(201).json({
     success: true,
-    token,
+    data: {
+      token,
+    },
   });
 });
