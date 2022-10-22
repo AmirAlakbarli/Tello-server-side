@@ -16,7 +16,7 @@ const propertySchema = mongoose.Schema(
   { timestamps: true }
 );
 
-categorySchema.pre("save", function (next) {
+propertySchema.pre("save", function (next) {
   this.slug = slugify(this.name, "-");
   next();
 });

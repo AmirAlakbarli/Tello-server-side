@@ -1,5 +1,6 @@
 const asyncCatch = require("../utils/asyncCatch");
 const User = require("../models/user");
+const Basket = require("../models/basket");
 const jwt = require("jsonwebtoken");
 const GlobalError = require("../errors/GlobalError");
 const sendEmail = require("../utils/email");
@@ -13,17 +14,32 @@ function signJWT(id) {
 }
 
 exports.signUp = asyncCatch(async (req, res, next) => {
+  //! create new user
   const newUser = await User.create({
     name: req.body.name,
+    surname: req.body.surname,
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
   });
+
+  //! check if user account was successfully created
   if (!newUser)
     return next(new GlobalError("Cannot create a new user account!"));
+
   const token = signJWT(newUser._id);
 
-  res.status(201).json({ success: true, data: { user: newUser, token } });
+  //! create basket for new user
+  const newBasket = await Basket.create({
+    userId: newUser._id,
+  });
+
+  //! check if basket was successfully created
+  if (!newBasket)
+    return next(new GlobalError("Cannot create basket for new user!"));
+
+  newUser.password = undefined;
+  res.status(201).json({ success: true, data: { token, user: newUser } });
 });
 
 exports.login = asyncCatch(async (req, res, next) => {
@@ -34,13 +50,15 @@ exports.login = asyncCatch(async (req, res, next) => {
 
   //! Check if email and password are correct
   const user = await User.findOne({ email }).select("+password");
+  if (!user) return next(new GlobalError("This user not be found!", 401));
   const isCorrect = await user.checkPassword(password, user.password);
   if (!(user && isCorrect))
     return next(new GlobalError("Email or password is incorrect!"));
 
   //! Sign JWT
   const token = signJWT(user._id);
-  res.json({ success: true, data: { token, user: user } });
+  user.password = undefined;
+  res.json({ success: true, data: { token, user } });
 });
 
 exports.forgetPassword = asyncCatch(async (req, res, next) => {

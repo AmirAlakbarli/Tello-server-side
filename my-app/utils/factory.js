@@ -25,7 +25,7 @@ const deleteOne = (Model) =>
     });
   });
 
-const updateOne = (Model) => {
+const updateOne = (Model) =>
   asyncCatch(async (req, res, next) => {
     const id = req.params.id;
     let updated = await Model.findOneAndUpdate({ _id: id }, req.body, {
@@ -40,13 +40,12 @@ const updateOne = (Model) => {
       },
     });
   });
-};
 
-const createNew = (Model) => {
+const createNew = (Model) =>
   asyncCatch(async (req, res, next) => {
     const created = await Model.create(req.body);
     if (!created)
-      next(
+      return next(
         new GlobalError(`Cannot create new ${Model.constructor.modelName}`, 500)
       );
     res.status(200).json({
@@ -56,6 +55,5 @@ const createNew = (Model) => {
       },
     });
   });
-};
 
 module.exports = { createNew, updateOne, deleteOne };
