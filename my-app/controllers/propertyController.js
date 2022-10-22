@@ -48,4 +48,4 @@ exports.updateProperty = asyncCatch(async (req, res, next) => {
   });
 });
 
-exports.deleteProduct = deleteOne(Property);
+exports.deleteProperty = deleteOne(Property);

@@ -14,18 +14,28 @@ function signJWT(id) {
 }
 
 exports.signUp = asyncCatch(async (req, res, next) => {
+  //! check if password and confirmation of password are same
+  if (req.body.password !== req.body.passwordConfirm)
+    return next(
+      new GlobalError(
+        "Password and confirmation of password are not the same",
+        401
+      )
+    );
+
   //! create new user
   const newUser = await User.create({
     name: req.body.name,
     surname: req.body.surname,
     email: req.body.email,
     password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
   });
 
   //! check if user account was successfully created
   if (!newUser)
     return next(new GlobalError("Cannot create a new user account!"));
+
+  await newUser.save();
 
   const token = signJWT(newUser._id);
 
@@ -57,6 +67,7 @@ exports.login = asyncCatch(async (req, res, next) => {
 
   //! Sign JWT
   const token = signJWT(user._id);
+
   user.password = undefined;
   res.json({ success: true, data: { token, user } });
 });
@@ -79,7 +90,7 @@ exports.forgetPassword = asyncCatch(async (req, res, next) => {
       message: path,
     });
 
-    res.json({ success: true, message: "Email was sent!" });
+    res.status(200).json({ success: true, message: "Email was sent!" });
   } catch (error) {
     return next(new GlobalError("Cannot sent link to reset password!", 401));
   }
@@ -101,8 +112,15 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
       new GlobalError("This token for resetting password isn't correct!", 401)
     );
 
+  if (req.body.password !== req.body.passwordConfirm)
+    return next(
+      new GlobalError(
+        "password and confirmation of password are not the same",
+        401
+      )
+    );
+
   user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
   user.resetExpires = undefined;
   user.forgetPassword = undefined;
 

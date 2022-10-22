@@ -9,8 +9,9 @@ const helmet = require("helmet");
 
 //! Routes
 const productRouter = require("./routes/productRouter");
-const userRouter = require("./routes/userRouter");
 const propertyRouter = require("./routes/propertyRouter");
+const userRouter = require("./routes/userRouter");
+const basketRouter = require("./routes/basketRouter");
 const reviewRouter = require("./routes/reviewRouter");
 const FAQRouter = require("./routes/FAQRouter");
 
@@ -45,6 +46,7 @@ app.use(express.json());
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/basket", basketRouter);
 app.use("/api/v1/reviews", reviewRouter);
 app.use("/api/v1/FAQ", FAQRouter);
 

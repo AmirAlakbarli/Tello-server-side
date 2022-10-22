@@ -18,6 +18,6 @@ router.post("/", propertyController.createProperty);
 router.patch("/:id", propertyController.updateProperty);
 
 // delete product
-router.delete("/:id", propertyController.deleteProduct);
+router.delete("/:id", propertyController.deleteProperty);
 
 module.exports = router;

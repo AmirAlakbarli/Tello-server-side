@@ -20,8 +20,19 @@ exports.updateUser = asyncCatch(async (req, res, next) => {
 
   if (!user)
     return next(new GlobalError("Cannot change account information!", 500));
-  res.status(200).json({ success: true, user });
+  res.status(200).json({
+    success: true,
+    data: {
+      user,
+    },
+  });
 });
 
-
-exports.deleteUser = deleteOne(User);
+exports.deleteUser = asyncCatch(async (req, res, next) => {
+  const deletedUser = await User.findByIdAndDelete(req.user._id);
+  if (!deletedUser) next(new GlobalError("Cannot delete accoun", 500));
+  res.status(200).json({
+    success: true,
+    message: "User deleted successfully",
+  });
+});

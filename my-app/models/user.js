@@ -29,17 +29,6 @@ const userSchema = mongoose.Schema(
       select: false,
     },
 
-    passwordConfirm: {
-      type: String,
-      required: [true, "Please confirm password!"],
-      validate: {
-        validator: function (passwordConfirm) {
-          return passwordConfirm === this.password;
-        },
-        message: "Please sure confirming password is as same as password",
-      },
-    },
-
     number: String,
 
     photo: String,
@@ -58,9 +47,7 @@ const userSchema = mongoose.Schema(
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-
   this.password = await bcrypt.hash(this.password, 12);
-  this.passwordConfirm = undefined;
   next();
 });
 
