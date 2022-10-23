@@ -17,17 +17,19 @@ const privateRoute = asyncCatch(async (req, res, next) => {
   }
   if (!token) return next(new GlobalError("There isn't token!"));
 
-  //! Check if toke is valid
+  //! Check if token is valid
   const verifyPromise = promisify(jwt.verify);
   const info = await verifyPromise(token, process.env.JWT_SIGNATURE);
+  if (!info) return next(new GlobalError("Token isn't valid or isn't sent"));
 
-  //! Check if user with sent token is exist
-  const user = await User.findById(info.id);
-  //! Check if basket with sent token is exist
-  const basket = await Basket.findById(info.id);
-  if (!user && !basket) return next(new GlobalError("Token isn't exist", 403));
-  if (user) req.user = user;
-  if (basket) req.basket = basket;
+  //! Check if token contain userId or basketId
+  if (info.userId) {
+    const user = await User.findById(info.userId);
+    req.user = user;
+  } else if (info.basketId) {
+    const basket = await Basket.findById(info.basketId);
+    req.basket = basket;
+  }
   next();
 });
 

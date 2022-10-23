@@ -1,14 +1,7 @@
 const Basket = require("../models/basket");
 const asyncCatch = require("../utils/asyncCatch");
 const GlobalError = require("../errors/GlobalError");
-const jwt = require("jsonwebtoken");
-
-function signJWT(id) {
-  const token = jwt.sign({ id }, process.env.JWT_SIGNATURE, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-  return token;
-}
+const signJWT = require("../utils/jwtGenerator");
 
 exports.getBasket = asyncCatch(async (req, res, next) => {
   let oneBasket;
@@ -30,7 +23,7 @@ exports.getBasket = asyncCatch(async (req, res, next) => {
 exports.createBasket = asyncCatch(async (req, res, next) => {
   const newBasket = await Basket.create({ products: req.body.products });
   if (!newBasket) return next(new GlobalError("Cannot create new basket", 500));
-  const token = signJWT(newBasket._id);
+  const token = signJWT({ basketId: newBasket._id });
   res.status(200).json({
     success: true,
     data: {
@@ -39,4 +32,29 @@ exports.createBasket = asyncCatch(async (req, res, next) => {
   });
 });
 
-exports.updateBasket = asyncCatch(async (req, res, next) => {});
+exports.updateBasket = asyncCatch(async (req, res, next) => {
+  let updatedBasket;
+  const userId = req?.user?._id;
+  const basketId = req?.basket?._id;
+  if (userId)
+    updatedBasket = await Basket.findOneAndUpdate({ userId }, req.body, {
+      new: true,
+    });
+  if (basketId)
+    updatedBasket = updatedBasket
+      ? updatedBasket
+      : await Basket.findByIdAndUpdate(basketId, req.body, {
+          new: true,
+        });
+        
+  updatedBasket.save();
+  if (!updatedBasket) return next(new GlobalError("Invalid id: UPDATE", 404));
+
+  const token = signJWT({ basketId: updatedBasket._id });
+  res.status(200).json({
+    success: true,
+    data: {
+      token,
+    },
+  });
+});

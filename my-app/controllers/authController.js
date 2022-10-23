@@ -1,17 +1,10 @@
 const asyncCatch = require("../utils/asyncCatch");
 const User = require("../models/user");
 const Basket = require("../models/basket");
-const jwt = require("jsonwebtoken");
+const signJWT = require("../utils/jwtGenerator");
 const GlobalError = require("../errors/GlobalError");
 const sendEmail = require("../utils/email");
 const bcrypt = require("bcryptjs");
-
-function signJWT(id) {
-  const token = jwt.sign({ id }, process.env.JWT_SIGNATURE, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-  return token;
-}
 
 exports.signUp = asyncCatch(async (req, res, next) => {
   //! check if password and confirmation of password are same
@@ -37,7 +30,7 @@ exports.signUp = asyncCatch(async (req, res, next) => {
 
   await newUser.save();
 
-  const token = signJWT(newUser._id);
+  const token = signJWT({ userId: newUser._id });
 
   //! create basket for new user
   const newBasket = await Basket.create({
@@ -66,7 +59,7 @@ exports.login = asyncCatch(async (req, res, next) => {
     return next(new GlobalError("Email or password is incorrect!"));
 
   //! Sign JWT
-  const token = signJWT(user._id);
+  const token = signJWT({ userId: user._id });
 
   user.password = undefined;
   res.json({
@@ -132,7 +125,7 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
   await user.save();
 
-  const newToken = signJWT(user._id);
+  const newToken = signJWT({userId:user._id});
 
   res.status(201).json({
     success: true,
@@ -173,7 +166,7 @@ exports.changePassword = asyncCatch(async (req, res, next) => {
 
   await user.save();
 
-  const token = signJWT(user._id);
+  const token = signJWT({userId:user._id});
 
   res.status(201).json({
     success: true,

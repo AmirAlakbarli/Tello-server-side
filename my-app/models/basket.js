@@ -8,7 +8,7 @@ const basketSchema = mongoose.Schema(
 
     products: [
       {
-        productId: {
+        product: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "product",
         },
@@ -27,9 +27,13 @@ const basketSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-basketSchema.pre("save", function () {
+basketSchema.pre("save", async function () {
+  await this.populate("products.product")
   this.totalPrice = this.products.reduce(
-    (sum, product) => sum + product.price * product.quantity,
+    (sum, product) =>
+      sum +
+      (product.producta.price + product.variant.extraPrice) *
+        product.quantity,
     0
   );
 
@@ -37,6 +41,11 @@ basketSchema.pre("save", function () {
     (sum, product) => sum + product.quantity,
     0
   );
+});
+
+basketSchema.pre(/^find/, function (next) {
+  this.populate("products.product", "name category price");
+  next();
 });
 
 const Basket = mongoose.model("basket", basketSchema);
