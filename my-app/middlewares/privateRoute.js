@@ -35,7 +35,7 @@ const privateRoute = asyncCatch(async (req, res, next) => {
 
 const access = (...roles) => {
   return function (req, res, next) {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req?.user?.role)) {
       return next(
         new GlobalError("You haven't permission for this operation", 403)
       );

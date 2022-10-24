@@ -9,10 +9,12 @@ const helmet = require("helmet");
 
 //! Routes
 const productRouter = require("./routes/productRouter");
-const propertyRouter = require("./routes/propertyRouter");
-const userRouter = require("./routes/userRouter");
-const basketRouter = require("./routes/basketRouter");
+const categoryRouter = require("./routes/categoryRouter");
 const reviewRouter = require("./routes/reviewRouter");
+const userRouter = require("./routes/userRouter");
+const orderRouter = require("./routes/orderRouter")
+const basketRouter = require("./routes/basketRouter");
+const propertyRouter = require("./routes/propertyRouter");
 const FAQRouter = require("./routes/FAQRouter");
 
 //! get limit for users requests
@@ -44,10 +46,12 @@ app.use(express.json());
 
 //! api for routers
 app.use("/api/v1/products", productRouter);
-app.use("/api/v1/properties", propertyRouter);
-app.use("/api/v1/users", userRouter);
-app.use("/api/v1/basket", basketRouter);
+app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/reviews", reviewRouter);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/orders",orderRouter);
+app.use("/api/v1/basket", basketRouter);
+app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/FAQ", FAQRouter);
 
 //! Any request with non existing endpoint

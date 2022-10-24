@@ -1,7 +1,8 @@
 const asyncCatch = require("../utils/asyncCatch");
 const GlobalError = require("../errors/GlobalError");
 const Review = require("../models/review");
-const { deleteOne } = require("../utils/factory");
+const Product = require("../models/product");
+const { getById, deleteOne } = require("../utils/factory");
 
 // exports.getAllReviews = asyncCatch(async (req, res, next) => {
 //   console.log("all");
@@ -18,7 +19,7 @@ const { deleteOne } = require("../utils/factory");
 //! merging of getAllReviews and getReviewsByProductId
 exports.getReviews = asyncCatch(async (req, res, next) => {
   const productId = req.params.productId;
-  if (tourId) {
+  if (productId) {
     const reviews = await Review.find({ product: productId });
     res.status(200).json({ success: true, data: { reviews } });
   } else {
@@ -27,14 +28,22 @@ exports.getReviews = asyncCatch(async (req, res, next) => {
   }
 });
 
+exports.getReviewById = getById(Review);
+
 exports.createReview = asyncCatch(async (req, res, next) => {
+  const productId = req.params.productId;
+  const product = await Product.findById(productId);
+  if (!product)
+    return next(
+      new GlobalError("Product which you want to add review to not found", 500)
+    );
   const newReview = await Review.create({
     ...req.body,
-    product: req.params.productId,
+    product: productId,
     creator: req.user._id,
   });
 
-  if (!newReview) return new GlobalError("Review cannot be created!");
+  if (!newReview) return new GlobalError("Review cannot be created!", 500);
 
   res.status(201).json({
     success: true,
@@ -50,7 +59,7 @@ exports.updateReview = asyncCatch(async (req, res, next) => {
     new: true,
   });
 
-  if (!updatedReview) return next(new GlobalError("Invalid id: UPDATE", 404));
+  if (!updatedReview) return next(new GlobalError("Invalid id: UPDATE", 500));
 
   res.status(200).json({
     success: true,

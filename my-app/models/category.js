@@ -6,6 +6,7 @@ const categorySchema = mongoose.Schema(
     name: {
       type: String,
       required: [true, "Category name must be defined!"],
+      unique: true,
     },
 
     slug: String,
@@ -25,5 +26,5 @@ categorySchema.pre("save", function (next) {
   next();
 });
 
-const Category = mongoose.model("category");
+const Category = mongoose.model("category", categorySchema);
 module.exports = Category;

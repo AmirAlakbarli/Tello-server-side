@@ -15,11 +15,13 @@ const reviewSchema = mongoose.Schema(
 
     creator: {
       type: mongoose.Schema.Types.ObjectId,
+      required: [true, "Creator of review must be defined!"],
       ref: "user",
     },
 
     product: {
       type: mongoose.Schema.Types.ObjectId,
+      required: [true, "Product which review belong to must be defined!"],
       ref: "product",
     },
   },
@@ -45,8 +47,8 @@ reviewSchema.statics.calcRatingsAverage = async function (productId) {
   ]);
 
   await Product.findByIdAndUpdate(productId, {
-    ratingsAverage: data[0].aveRating,
-    ratingsQuantity: data[0].numberOfRating,
+    ratingsAverage: data[0]?.aveRating ? data[0]?.aveRating : 0,
+    ratingsQuantity: data[0]?.numberOfRating ? data[0]?.numberOfRating : 0,
   });
 };
 

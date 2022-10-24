@@ -5,14 +5,14 @@ const productSchema = mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "User name must be defined!"],
+      required: [true, "Product name must be defined!"],
     },
 
     description: {
       type: String,
     },
 
-    category: [
+    categories: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "category",
@@ -20,19 +20,23 @@ const productSchema = mongoose.Schema(
       },
     ],
 
+    features: {
+      type: Object,
+    },
+
     price: {
       type: Number,
     },
 
     ratingsQuantity: {
       type: Number,
+      default: 0,
     },
 
     ratingsAverage: {
       type: Number,
+      default: 0,
     },
-
-    variants: [Object],
   },
 
   { timestamps: true }

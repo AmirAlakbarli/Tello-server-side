@@ -10,6 +10,7 @@ const propertySchema = mongoose.Schema(
 
     values: {
       type: Array,
+      required: [true, "Property values must be defined!"],
     },
   },
 

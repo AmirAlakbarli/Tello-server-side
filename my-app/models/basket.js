@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Product = require("../models/product");
 
 const basketSchema = mongoose.Schema(
   {
@@ -27,20 +28,16 @@ const basketSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-basketSchema.pre("save", async function () {
-  await this.populate("products.product")
-  this.totalPrice = this.products.reduce(
-    (sum, product) =>
-      sum +
-      (product.producta.price + product.variant.extraPrice) *
-        product.quantity,
-    0
-  );
+basketSchema.pre("save", function (next) {
+  // this.totalPrice = this.products.reduce((sum, p) => {
+  //   return sum + (p.product.price + p.variant.extraPrice) * p.quantity;
+  // }, 0);
 
   this.totalCount = this.products.reduce(
     (sum, product) => sum + product.quantity,
     0
   );
+  next();
 });
 
 basketSchema.pre(/^find/, function (next) {
