@@ -32,6 +32,7 @@ exports.getProductById = asyncCatch(async (req, res, next) => {
 exports.createProduct = asyncCatch(async (req, res, next) => {
   const newProduct = await Product.create(req.body);
   if (!newProduct) return next(new GlobalError("Cannot create new product", 500));
+  newProduct.status = undefined;
   res.status(201).json({
     success: true,
     data: {

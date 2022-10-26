@@ -3,6 +3,14 @@ const slugify = require("slugify");
 
 const productSchema = mongoose.Schema(
   {
+    status: {
+      type: Number,
+      required: true,
+      enum: [0, 1],
+      default: 1,
+      select: false,
+    },
+
     name: {
       type: String,
       required: [true, "Product name must be defined!"],
@@ -39,8 +47,19 @@ const productSchema = mongoose.Schema(
     },
   },
 
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
+
+productSchema.virtual("reviews", {
+  ref: "review",
+  foreignField: "product",
+  localField: "_id",
+});
+
+productSchema.pre(/^find/, function (next) {
+  this.find({ status: { $ne: 0 } });
+  next();
+});
 
 productSchema.pre("save", function (next) {
   this.slug = slugify(this.name, "-");

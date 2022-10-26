@@ -3,6 +3,14 @@ const Product = require("./product");
 
 const reviewSchema = mongoose.Schema(
   {
+    status: {
+      type: Number,
+      required: true,
+      enum: [0, 1],
+      default: 1,
+      select: false,
+    },
+    
     description: {
       type: String,
     },
@@ -28,6 +36,11 @@ const reviewSchema = mongoose.Schema(
 
   { timestamps: true }
 );
+
+reviewSchema.pre(/^find/, function (next) {
+  this.find({ status: { $ne: 0 } });
+  next();
+});
 
 reviewSchema.statics.calcRatingsAverage = async function (productId) {
   const data = await this.aggregate([

@@ -5,6 +5,14 @@ const crypto = require("crypto");
 
 const userSchema = mongoose.Schema(
   {
+    status: {
+      type: Number,
+      required: true,
+      enum: [0, 1],
+      default: 1,
+      select: false,
+    },
+
     name: {
       type: String,
       required: [true, "User name must be defined!"],
@@ -44,6 +52,11 @@ const userSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ status: { $ne: 0 } });
+  next();
+});
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

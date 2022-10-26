@@ -1,8 +1,15 @@
 const mongoose = require("mongoose");
-const Product = require("../models/product");
 
 const basketSchema = mongoose.Schema(
   {
+    status: {
+      type: Number,
+      required: true,
+      enum: [0, 1],
+      default: 1,
+      select: false,
+    },
+
     userId: {
       type: mongoose.Schema.Types.ObjectId,
     },
@@ -11,37 +18,37 @@ const basketSchema = mongoose.Schema(
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
+          required: [true, "product must be defined!"],
           ref: "product",
         },
-        variant: {
+        feature: {
           type: Object,
         },
-        quantity: Number,
+        price: {
+          type: Number,
+          required: [true, "Product price must be defined!"],
+        },
+        quantity: {
+          type: Number,
+          required: [true, "Quantity of product must be defined!"],
+        },
       },
     ],
-
-    totalCount: Number,
-
-    totalPrice: Number,
   },
 
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
-basketSchema.pre("save", function (next) {
-  // this.totalPrice = this.products.reduce((sum, p) => {
-  //   return sum + (p.product.price + p.variant.extraPrice) * p.quantity;
-  // }, 0);
+basketSchema.virtual("totalCount").get(function () {
+  return this.products.reduce((sum, p) => sum + p.price * p.quantity, 0);
+});
 
-  this.totalCount = this.products.reduce(
-    (sum, product) => sum + product.quantity,
-    0
-  );
-  next();
+basketSchema.virtual("totalPrice").get(function () {
+  return this.products.reduce((sum, product) => sum + product.quantity, 0);
 });
 
 basketSchema.pre(/^find/, function (next) {
-  this.populate("products.product", "name category price");
+  this.find({ status: { $ne: 0 } }).populate("products.product", "name category price");
   next();
 });
 

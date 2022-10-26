@@ -47,7 +47,8 @@ exports.updateBasket = asyncCatch(async (req, res, next) => {
           new: true,
         });
         
-  updatedBasket.save();
+  await updatedBasket.save();
+
   if (!updatedBasket) return next(new GlobalError("Invalid id: UPDATE", 404));
 
   const token = signJWT({ basketId: updatedBasket._id });
