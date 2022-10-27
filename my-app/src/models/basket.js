@@ -10,7 +10,7 @@ const basketSchema = mongoose.Schema(
       select: false,
     },
 
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
     },
 
@@ -18,16 +18,15 @@ const basketSchema = mongoose.Schema(
       {
         product: {
           type: mongoose.Schema.Types.ObjectId,
-          required: [true, "product must be defined!"],
+          required: [true, "Product must be defined!"],
           ref: "product",
         },
-        feature: {
-          type: Object,
-        },
+
         price: {
           type: Number,
           required: [true, "Product price must be defined!"],
         },
+
         quantity: {
           type: Number,
           required: [true, "Quantity of product must be defined!"],
@@ -39,16 +38,19 @@ const basketSchema = mongoose.Schema(
   { timestamps: true, toJSON: { virtuals: true } }
 );
 
-basketSchema.virtual("totalCount").get(function () {
+basketSchema.virtual("totalPrice").get(function () {
   return this.products.reduce((sum, p) => sum + p.price * p.quantity, 0);
 });
 
-basketSchema.virtual("totalPrice").get(function () {
+basketSchema.virtual("totalCount").get(function () {
   return this.products.reduce((sum, product) => sum + product.quantity, 0);
 });
 
 basketSchema.pre(/^find/, function (next) {
-  this.find({ status: { $ne: 0 } }).populate("products.product", "name category price");
+  this.find({ status: { $ne: 0 } }).populate(
+    "products.product",
+    "name categories features price"
+  );
   next();
 });
 

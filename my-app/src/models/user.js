@@ -37,9 +37,13 @@ const userSchema = mongoose.Schema(
       select: false,
     },
 
-    number: String,
+    phoneNumber: {
+      type: String,
+    },
 
-    photo: String,
+    photo: {
+      type: String,
+    },
 
     role: {
       type: String,
@@ -50,13 +54,28 @@ const userSchema = mongoose.Schema(
     forgetPassword: String,
     resetExpires: Date,
   },
-  { timestamps: true }
+
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
-userSchema.pre(/^find/, function (next) {
-  this.find({ status: { $ne: 0 } });
-  next();
-});
+// userSchema.virtual("basket", {
+//   ref: "basket",
+//   foreignField: "user",
+//   localField: "_id",
+// });
+
+// userSchema.virtual("orders", {
+//   ref: "order",
+//   foreignField: "user",
+//   localField: "_id",
+// });
+
+// userSchema.pre(/^find/, function (next) {
+//   this.find({ status: { $ne: 0 } })
+//     .populate("basket")
+//     .populate("orders");
+//   next();
+// });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();

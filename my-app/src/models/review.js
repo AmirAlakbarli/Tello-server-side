@@ -10,7 +10,7 @@ const reviewSchema = mongoose.Schema(
       default: 1,
       select: false,
     },
-    
+
     description: {
       type: String,
     },
@@ -21,9 +21,9 @@ const reviewSchema = mongoose.Schema(
       max: 5,
     },
 
-    creator: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      required: [true, "Creator of review must be defined!"],
+      required: [true, "User of review must be defined!"],
       ref: "user",
     },
 
@@ -37,16 +37,12 @@ const reviewSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-reviewSchema.pre(/^find/, function (next) {
-  this.find({ status: { $ne: 0 } });
-  next();
-});
-
 reviewSchema.statics.calcRatingsAverage = async function (productId) {
   const data = await this.aggregate([
     {
       $match: {
         product: productId,
+        status: 1,
       },
     },
 
@@ -71,6 +67,14 @@ reviewSchema.post("save", function (doc) {
 
 reviewSchema.post(/^findOneAnd/, async function (doc) {
   doc.constructor.calcRatingsAverage(doc.product);
+});
+
+reviewSchema.pre(/^find/, function (next) {
+  this.find({ status: { $ne: 0 } }).populate(
+    "user",
+    "name surname email phoneNumber photo"
+  );
+  next();
 });
 
 const Review = mongoose.model("review", reviewSchema);

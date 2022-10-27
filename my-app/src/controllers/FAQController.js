@@ -1,6 +1,5 @@
 const FAQ = require("../models/FAQ");
-const asyncCatch = require("../utils/asyncCatch");
-const GlobalError = require("../errors/GlobalError");
+
 const {
   getAll,
   getById,

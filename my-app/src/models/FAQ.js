@@ -14,6 +14,7 @@ const FAQSchema = mongoose.Schema(
       type: String,
       required: [true, "Please provide a title!"],
     },
+    
     description: {
       type: String,
       required: [true, "Please provide a description!"],

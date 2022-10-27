@@ -29,11 +29,16 @@ const getById = (Model) =>
 
 const createNew = (Model) =>
   asyncCatch(async (req, res, next) => {
-    const created = await Model.create(req.body);
+    let created;
+    if (req?.user?.role === "admin") created = await Model.create(req.body);
+    else created = await Model.create({ ...req.body, user: req?.user?._id });
+
     if (!created)
       return next(
         new GlobalError(`Cannot create new ${Model.constructor.modelName}`, 500)
       );
+
+    created.status = undefined;
 
     res.status(200).json({
       success: true,
@@ -49,12 +54,12 @@ const updateOne = (Model) =>
 
     let updated;
 
-    if (req.user.role === "admin") {
+    if (req?.user?.role === "admin") {
       updated = await Model.findByIdAndUpdate(id, req.body, {
         new: true,
       });
     } else {
-      Model.findOneAndUpdate({ _id: id, creator: req.user._id }, req.body, {
+      Model.findOneAndUpdate({ _id: id, user: req?.user?._id }, req.body, {
         new: true,
       });
     }
@@ -74,12 +79,12 @@ const deleteOne = (Model) =>
 
     let deleted;
 
-    if (req.user.role === "admin") {
+    if (req?.user?.role === "admin") {
       deleted = await Model.findByIdAndDelete(id);
     } else {
       deleted = await Model.findOneAndDelete({
         _id: id,
-        creator: req.user._id,
+        user: req?.user?._id,
       });
     }
 

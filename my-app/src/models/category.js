@@ -19,7 +19,7 @@ const categorySchema = mongoose.Schema(
 
     slug: String,
 
-    parentId: {
+    parent: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "category",
       default: null,
@@ -30,7 +30,7 @@ const categorySchema = mongoose.Schema(
 );
 
 categorySchema.pre(/^find/, function (next) {
-  this.find({ status: { $ne: 0 } });
+  this.find({ status: { $ne: 0 } }).populate("parent");
   next();
 });
 

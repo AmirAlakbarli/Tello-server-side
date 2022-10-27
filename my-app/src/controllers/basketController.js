@@ -21,7 +21,8 @@ exports.getBasket = asyncCatch(async (req, res, next) => {
 });
 
 exports.createBasket = asyncCatch(async (req, res, next) => {
-  const newBasket = await Basket.create({ products: req.body.products });
+  req.body.status = undefined;
+  const newBasket = await Basket.create({ products: req.body?.products });
   if (!newBasket) return next(new GlobalError("Cannot create new basket", 500));
   const token = signJWT({ basketId: newBasket._id });
   res.status(200).json({

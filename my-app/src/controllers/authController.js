@@ -3,7 +3,7 @@ const User = require("../models/user");
 const Basket = require("../models/basket");
 const signJWT = require("../utils/jwtGenerator");
 const GlobalError = require("../errors/GlobalError");
-const sendEmail = require("../utils/email");
+const Email = require("../utils/email");
 const bcrypt = require("bcryptjs");
 
 exports.signUp = asyncCatch(async (req, res, next) => {
@@ -30,11 +30,15 @@ exports.signUp = asyncCatch(async (req, res, next) => {
 
   await newUser.save();
 
+  const url = "https://amiralakbarli.github.io/Tello/";
+  const emailHandler = new Email(newUser, url);
+  await emailHandler.sendWelcome();
+
   const token = signJWT({ userId: newUser._id });
 
   //! create basket for new user
   const newBasket = await Basket.create({
-    userId: newUser._id,
+    user: newUser._id,
   });
 
   //! check if basket was successfully created
@@ -76,15 +80,9 @@ exports.forgetPassword = asyncCatch(async (req, res, next) => {
     const passwordToken = await user.generatePassToken();
     await user.save({ validateBeforeSave: false });
 
-    const path = `Please follow the link to change password: ${
-      req.protocol
-    }://${req.get("host")}/api/v1/resetPassword/${user._id}/${passwordToken}`;
-
-    await sendEmail({
-      email: user.email,
-      subject: "Change password",
-      message: path,
-    });
+    const path = `https://amiralakbarli.github.io/Tello/resetPassword/${user._id}/${passwordToken}`;
+    const emailHandler = new Email(user, path);
+    await emailHandler.sendResetPassword();
 
     res.status(200).json({
       success: true,
@@ -125,7 +123,7 @@ exports.resetPassword = asyncCatch(async (req, res, next) => {
 
   await user.save();
 
-  const newToken = signJWT({userId:user._id});
+  const newToken = signJWT({ userId: user._id });
 
   res.status(201).json({
     success: true,
@@ -166,7 +164,7 @@ exports.changePassword = asyncCatch(async (req, res, next) => {
 
   await user.save();
 
-  const token = signJWT({userId:user._id});
+  const token = signJWT({ userId: user._id });
 
   res.status(201).json({
     success: true,

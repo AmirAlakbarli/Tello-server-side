@@ -4,28 +4,12 @@ const categoryController = require("../controllers/categoryController");
 const { privateRoute, access } = require("../middlewares/privateRoute");
 
 router.get("/", categoryController.getAllCategories);
-
 router.get("/:id", categoryController.getCategoryById);
 
-router.post(
-  "/",
-  privateRoute,
-  access("admin"),
-  categoryController.createCategory
-);
+router.use(privateRoute, access("admin"));
 
-router.patch(
-  "/:id",
-  privateRoute,
-  access("admin"),
-  categoryController.updateCategory
-);
-
-router.delete(
-  "/:id",
-  privateRoute,
-  access("admin"),
-  categoryController.deleteCategory
-);
+router.post("/", categoryController.createCategory);
+router.patch("/:id", categoryController.updateCategory);
+router.delete("/:id", categoryController.deleteCategory);
 
 module.exports = router;

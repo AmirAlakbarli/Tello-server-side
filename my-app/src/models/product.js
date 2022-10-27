@@ -36,6 +36,8 @@ const productSchema = mongoose.Schema(
       type: Number,
     },
 
+    images: [String],
+
     ratingsQuantity: {
       type: Number,
       default: 0,
@@ -57,7 +59,9 @@ productSchema.virtual("reviews", {
 });
 
 productSchema.pre(/^find/, function (next) {
-  this.find({ status: { $ne: 0 } });
+  this.find({ status: { $ne: 0 } })
+    .populate("reviews")
+    .populate("categories");
   next();
 });
 

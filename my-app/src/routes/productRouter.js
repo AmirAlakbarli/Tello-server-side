@@ -3,7 +3,7 @@ const router = express.Router();
 const productController = require("../controllers/productController");
 const { privateRoute, access } = require("../middlewares/privateRoute");
 //! merging with review router
-const reviewRouter = require("../routes/reviewRouter")
+const reviewRouter = require("../routes/reviewRouter");
 
 //! subrouters in product router
 
@@ -14,33 +14,16 @@ router.get("/", productController.getAllProducts);
 router.get("/:id", productController.getProductById);
 
 //! go review router for get review by productId
-router.use("/:productId/reviews",reviewRouter)
+router.use("/:productId/reviews", reviewRouter);
 
+router.use(privateRoute, access("admin"));
 // create new product
-router.post(
-  "/",
-  privateRoute,
-  access("admin"),
-  productController.createProduct
-);
+router.post("/", productController.createProduct);
 
 // update product
-router.patch(
-  "/:id",
-  privateRoute,
-  access("admin"),
-  productController.updateProduct
-);
+router.patch("/:id", productController.updateProduct);
 
 // delete product
-router.delete(
-  "/:id",
-  privateRoute,
-  access("admin"),
-  productController.deleteProduct
-);
-
-// get reviews by productId
-router.get("/:productId/reviews");
+router.delete("/:id", productController.deleteProduct);
 
 module.exports = router;
