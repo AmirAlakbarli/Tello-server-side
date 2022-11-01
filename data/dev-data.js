@@ -1,8 +1,7 @@
-const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config({ path: "../config.env" });
 const fs = require("fs");
-const Product = require("../models/Product");
+const Product = require("../src/models/product");
 
 //! MongoDB Connection
 const DB = process.env.DB_URL.replace("<password>", process.env.DB_PASSWORD);
